@@ -1,19 +1,10 @@
 from sqlalchemy.orm import Session
-from models import SessionLocal, Items, Base
+from models import Items
 from fastapi import Depends, HTTPException, APIRouter
 from model.ItemModel import ItemCreate, ItemUpdate
+from database import get_db
 
 router = APIRouter(prefix="/api/items", tags=["Items"])
-
-
-# Dependency to get the database session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 
 # @app.get("/items/{item_id}")
 # def read_item(item_id: int, q: Union[str, None] = None, h: Union[int, None] = None):
