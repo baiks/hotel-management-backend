@@ -1,9 +1,7 @@
-from model.LoginRequest import LoginRequest
-from model.Token import Token
 from models import Users
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
-from model.UserModel import UserCreate
+from model.UserModel import UserCreate, LoginRequest, Token, UserUpdate
 from database import get_db
 from passlib.context import CryptContext
 from utils.auth import (
@@ -55,8 +53,30 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 
 
 @router.get("/{id}")
-def get_user(id: int, db: Session = Depends(get_db)):
+def get_user(id: int, db: Session = Depends(get_db), token: str = Depends(verify_token)):
     user = db.query(Users).filter(Users.id == id).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+@router.put("/{id}")
+def update_user(id: int, user: UserUpdate, db: Session = Depends(get_db), token: str = Depends(verify_token)):
+    db_user = db.query(Users).filter(Users.id == id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Extract only non-empty fields
+    update_data = {k: v for k, v in user.dict().items() if v not in [None, ""]}
+
+    # Hash password if provided
+    if "password" in update_data:
+        update_data["password"] = hash_password(update_data["password"])
+
+    # Update the user model
+    for key, value in update_data.items():
+        setattr(db_user, key, value)
+
+    db.commit()
+    db.refresh(db_user)
+    return db_user

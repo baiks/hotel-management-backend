@@ -5,14 +5,20 @@ from passlib.context import CryptContext
 from fastapi import HTTPException, status, Security, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
+from dotenv import load_dotenv
+import os
+import urllib.parse
 
 security = HTTPBearer()
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
-SECRET_KEY = "supersecretkey123"  # 👈 Replace with env var in production
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 from models import Users
+
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = urllib.parse.quote(os.getenv("ALGORITHM"))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
 def hash_password(password: str):
@@ -51,6 +57,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Security(security))
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-        return username
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
