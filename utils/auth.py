@@ -1,6 +1,6 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from jose import JWTError, jwt
+from jose import JWTError, jwt, ExpiredSignatureError
 from passlib.context import CryptContext
 from fastapi import HTTPException, status, Security, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -12,7 +12,7 @@ import urllib.parse
 security = HTTPBearer()
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
-from models import Users
+from schemas.users import Users
 
 load_dotenv()
 

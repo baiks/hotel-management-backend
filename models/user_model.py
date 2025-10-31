@@ -1,12 +1,21 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
+
+from enum import Enum
+
+
+class UserRole(str, Enum):
+    ADMIN = "ADMIN"
+    NORMAL = "NORMAL"
+    MANAGER = "MANAGER"
 
 
 class UserCreate(BaseModel):
     first_name: str
     last_name: str
-    email: str
-    password: str
+    email: EmailStr = Field(..., example="john.doe@example.com")
+    password: str = Field(..., min_length=6, example="strongpassword123")
+    role: UserRole = Field(default=UserRole.NORMAL, example="NORMAL")
 
 
 class LoginRequest(BaseModel):

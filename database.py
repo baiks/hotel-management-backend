@@ -20,7 +20,6 @@ DB_PORT = os.getenv("DB_PORT")
 # DATABASE_URL = "mysql+pymysql://root:Baiks@123@localhost/fastapi"
 
 DATABASE_URL = f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-print("Database Connection: ", DATABASE_URL)
 
 Base = declarative_base()
 engine = create_engine(DATABASE_URL)

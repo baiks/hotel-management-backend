@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
-from models import Items
+from schemas.items import Items
 from fastapi import Depends, HTTPException, APIRouter
-from model.ItemModel import ItemCreate, ItemUpdate
+from models.item_model import ItemCreate, ItemUpdate
 from database import get_db
 
 router = APIRouter(prefix="/api/items", tags=["Items"])
+
 
 # @app.get("/items/{item_id}")
 # def read_item(item_id: int, q: Union[str, None] = None, h: Union[int, None] = None):

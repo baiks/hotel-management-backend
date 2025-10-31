@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import usersRouter, itemsRouter
+from routers import users_router, items_router
 from database import engine, Base
 
 # uvicorn main:app --reload
@@ -13,10 +13,10 @@ app = FastAPI(
     docs_url="/api/docs",  # Optional: Change the URL for the Swagger documentation
     redoc_url="/api/redoc"  # Optional: Change the URL for Redoc documentation
 )
-app.include_router(usersRouter.router)
-app.include_router(itemsRouter.router)
+app.include_router(users_router.router)
+app.include_router(items_router.router)
 
 
-@app.get("api/")
+@app.get("/")
 def read_root():
     return {"message": "Welcome to the Hotel Management API!"}
