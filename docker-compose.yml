@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: hotel_management_app
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=production
+    volumes:
+      - .:/app  # Optional: for live code updates during dev
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    restart: always

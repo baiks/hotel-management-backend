@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, Enum as SqlEnum
+from sqlalchemy import Column, Integer, String, Boolean, Enum as SqlEnum, DateTime, ForeignKey, func
 from database import Base
 from enum import Enum
 
@@ -18,3 +18,7 @@ class Users(Base):
     email = Column(String(255), index=True, unique=True)
     password = Column(String(255), index=True)
     role = Column(SqlEnum(UserRole), index=True, nullable=False, default=UserRole.NORMAL)
+    created_on = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    updated_on = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_by = Column(Integer, ForeignKey("users.id"), nullable=True)
