@@ -17,7 +17,7 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 from database import Base
-from schemas import users, items  # Make sure models are imported
+from schemas import users, items, bookings, rooms  # Make sure models are imported
 
 target_metadata = Base.metadata
 

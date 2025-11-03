@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, Enum as SqlEnum, DateTime, ForeignKey, func
 from database import Base
 from enum import Enum
+from sqlalchemy.orm import relationship
 
 
 class UserRole(str, Enum):
@@ -22,3 +23,5 @@ class Users(Base):
     created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
     updated_on = Column(DateTime(timezone=True), onupdate=func.now())
     updated_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    # Back-reference for rooms created by this user
+    rooms_created = relationship("Rooms", back_populates="created_by_user")

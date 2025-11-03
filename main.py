@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import users_router, items_router
+from routers import users_router, items_router, rooms_router, booking_router
 from database import engine, Base
 
 # uvicorn main:app --reload
@@ -15,6 +15,8 @@ app = FastAPI(
 )
 app.include_router(users_router.router)
 app.include_router(items_router.router)
+app.include_router(rooms_router.router)
+app.include_router(booking_router.router)
 
 
 @app.get("/")
