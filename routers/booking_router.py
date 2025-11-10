@@ -4,6 +4,7 @@ from typing import List, Optional
 from database import get_db
 from models.booking_model import Booking, BookingCreate, BookingUpdate
 from services import booking_service
+from utils.auth import get_current_user
 
 router = APIRouter(
     prefix="/bookings",
@@ -12,14 +13,15 @@ router = APIRouter(
 
 
 @router.post("/", response_model=Booking, status_code=status.HTTP_201_CREATED)
-def create_booking(booking: BookingCreate, db: Session = Depends(get_db)):
+def create_booking(booking: BookingCreate, db: Session = Depends(get_db),
+                   current_user_data: dict = Depends(get_current_user)):
     """
     Create a new booking
     - Validates room availability
     - Checks for date conflicts
     - Validates guest capacity
     """
-    return booking_service.create_booking(db, booking)
+    return booking_service.create_booking(db, booking, current_user_data)
 
 
 @router.get("/", response_model=List[Booking])

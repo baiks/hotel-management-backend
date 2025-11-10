@@ -61,8 +61,14 @@ def check_room_availability(
     return conflicting_bookings is None
 
 
-def create_booking(db: Session, booking: BookingCreate) -> Bookings:
+def create_booking(db: Session, booking: BookingCreate, current_user_data: dict) -> Bookings:
     """Create a new booking"""
+    user = current_user_data["user"]
+    token = current_user_data["token"]
+
+    # You can log or use token if needed (e.g., auditing)
+    print(f"User {user.email} creating booking with token: {token[:10]}...")
+
     # Validate dates
     if booking.check_out <= booking.check_in:
         raise HTTPException(
@@ -101,7 +107,7 @@ def create_booking(db: Session, booking: BookingCreate) -> Bookings:
 
     # Create booking
     booking_data = booking.dict()
-    db_booking = Bookings(**booking_data)
+    db_booking = Bookings(**booking_data, created_by=user.id)
     db.add(db_booking)
     db.commit()
     db.refresh(db_booking)

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from schemas.rooms import Rooms
-from models.rooms_model import RoomCreate, RoomUpdate
+from models.rooms_model import RoomBase, RoomUpdate
 from fastapi import HTTPException, status
 from typing import List, Optional
 
@@ -34,8 +34,14 @@ def get_room_by_number(db: Session, room_number: str) -> Optional[Rooms]:
     return db.query(Rooms).filter(Rooms.room_number == room_number).first()
 
 
-def create_room(db: Session, room: RoomCreate) -> Rooms:
+def create_room(db: Session, room: RoomBase, current_user_data: dict) -> Rooms:
     """Create a new room"""
+    user = current_user_data["user"]
+    token = current_user_data["token"]
+
+    # You can log or use token if needed (e.g., auditing)
+    print(f"User {user.email} creating booking with token: {token[:10]}...")
+
     # Check if room number already exists
     existing_room = get_room_by_number(db, room.room_number)
     if existing_room:
@@ -45,7 +51,7 @@ def create_room(db: Session, room: RoomCreate) -> Rooms:
         )
 
     room_data = room.dict()
-    db_room = Rooms(**room_data)
+    db_room = Rooms(**room_data, created_by=user.id)
     db.add(db_room)
     db.commit()
     db.refresh(db_room)

@@ -29,11 +29,6 @@ class RoomBase(BaseModel):
     discount_percent: float = 0.0
 
 
-# ----- Create schema -----
-class RoomCreate(RoomBase):
-    created_by: Optional[int] = None  # user ID creating the room
-
-
 # ----- Update schema -----
 class RoomUpdate(BaseModel):
     description: Optional[str] = None

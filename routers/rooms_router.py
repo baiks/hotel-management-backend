@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
-from models.rooms_model import Room, RoomCreate, RoomUpdate
+from models.rooms_model import Room, RoomBase, RoomUpdate
 from services import room_service
+from utils.auth import get_current_user
 
 router = APIRouter(
     prefix="/rooms",
@@ -12,11 +13,11 @@ router = APIRouter(
 
 
 @router.post("/", response_model=Room, status_code=status.HTTP_201_CREATED)
-def create_room(room: RoomCreate, db: Session = Depends(get_db)):
+def create_room(room: RoomBase, db: Session = Depends(get_db), current_user_data: dict = Depends(get_current_user)):
     """
     Create a new room in the hotel
     """
-    return room_service.create_room(db, room)
+    return room_service.create_room(db, room, current_user_data)
 
 
 @router.get("/", response_model=List[Room])

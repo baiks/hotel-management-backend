@@ -17,7 +17,6 @@ class BookingBase(BaseModel):
 class BookingCreate(BookingBase):
     total_price: float = Field(..., gt=0)
     status: str = Field(default="pending")
-    created_by: Optional[int] = None
 
 
 # ----- Update schema -----

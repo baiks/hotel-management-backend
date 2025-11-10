@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import os
 import urllib.parse
+from database import get_db
 
 security = HTTPBearer()
 
@@ -57,6 +58,31 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Security(security))
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
+    """
+    Extract user info from token and return user object from DB.
+    """
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+        # Fetch the user by email (or adjust to match your payload)
+        user = db.query(Users).filter(Users.email == username).first()
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+
+        # ✅ Return both user and token if needed
+        return {"user": user, "token": token}
+
     except ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
     except JWTError:
